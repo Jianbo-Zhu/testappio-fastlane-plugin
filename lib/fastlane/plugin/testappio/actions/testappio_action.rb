@@ -6,6 +6,7 @@ module Fastlane
     class TestappioAction < Action
       def self.run(params)
         UI.message("The testappio plugin is working!")
+        UI.message("Thanks for using testappio " + params[:name])
       end
 
       def self.description
@@ -27,11 +28,11 @@ module Fastlane
 
       def self.available_options
         [
-          # FastlaneCore::ConfigItem.new(key: :your_option,
-          #                         env_name: "TESTAPPIO_YOUR_OPTION",
-          #                      description: "A description of your option",
-          #                         optional: false,
-          #                             type: String)
+          FastlaneCore::ConfigItem.new(key: :name,
+                                  env_name: "TESTAPPIO_NAME",
+                               description: "A description of your option",
+                                  optional: false,
+                                      type: String)
         ]
       end
 

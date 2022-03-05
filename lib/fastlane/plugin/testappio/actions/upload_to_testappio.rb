@@ -15,15 +15,53 @@ module Fastlane
         # fastlane will take care of reading in the parameter and fetching the environment variable:
         api_token = params[:api_token]
         app_id = params[:app_id]
-        file_path = params[:file_path].to_s
+        apk_file = params[:apk_file]
+        ipa_file = params[:ipa_file]
+        release = params[:release]
+        release_notes = params[:release_notes]
+        notify = params[:notify]
+        source = params[:source]
 
-        validate_file_path(file_path)
+        
+        validate_file_path(apk_file)
+        validate_file_path(ipa_file)
+
+        command = ["ta-cli"]
+        command.push("publish")
+        command.push("--api_token=#{api_token}")
+        command.push("--app_id=#{app_id}")
+        command.push("--release=#{release}")
+        command.push("--apk=#{apk_file}") unless release == "ios"
+        command.push("--ipa=#{ipa_file}") unless release == "android"
+        command.push("--release_notes=#{release_notes}")
+        command.push("--notify=#{notify}")
+        command.push("--source=#{source}")
 
         UI.message "Uploading to testapp.io"
+        require 'open3'
+        if FastlaneCore::Globals.verbose?
+          UI.verbose("ta-cli command:\n\n")
+          UI.command(command.to_s)
+          UI.verbose("\n\n")
+        end
+        final_command = command.map { |arg| Shellwords.escape(arg) }.join(" ")
+        out = []
+        error = []
+        Open3.popen3(final_command) do |stdin, stdout, stderr, wait_thr|
+          while (line = stdout.gets)
+            out << line
+            UI.message(line.strip!)
+          end
+          while (line = stderr.gets)
+            error << line.strip!
+          end
+          exit_status = wait_thr.value
+          unless exit_status.success? && error.empty?
+            Helper::TestappioHelper.handle_error(error)
+          end
+        end
+        UI.success("Successfully uploaded to TestAppIO!")
 
-        # sh "shellcommand ./path"
-
-        # Actions.lane_context[SharedValues::UPLOAD_TO_TESTAPPIO_CUSTOM_VALUE] = "my_val"
       end
 
       # Validate file_path.
@@ -38,7 +76,7 @@ module Fastlane
       end
 
       def self.description
-        "A short description with <= 80 characters of what this action does"
+        "Official fastlane plugin for TestApp.io."
       end
 
       def self.default_file_path
@@ -55,7 +93,7 @@ module Fastlane
       def self.details
         # Optional:
         # this is your chance to provide a more detailed description of this action
-        "You can use this action to do cool things..."
+        "This Fastlane plugin uploads your Android (APK) and iOS (IPA) package to TestApp.io and notify your team members about the new releases if you enable it."
       end
 
       def self.available_options
@@ -71,33 +109,51 @@ module Fastlane
                                           # UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_id,
-                                       env_name: "FL_UPLOAD_TO_TESTAPPIO_DEVELOPMENT",
-                                       description: "Create a development certificate instead of a distribution one",
+                                       env_name: "FL_UPLOAD_TO_TESTAPPIO_APP_ID",
+                                       description: "You can get it from your app page in https://portal.testapp.io/apps",
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
-          FastlaneCore::ConfigItem.new(key: :file_path,
-                                      description: "Path to the app file",
+          FastlaneCore::ConfigItem.new(key: :release,
+                                       env_name: "FL_UPLOAD_TO_TESTAPPIO_RELEASE",
+                                       description: "It can be either both or android or ios",
+                                       is_string: true), # true: verifies the input is a string, false: every kind of value
+          FastlaneCore::ConfigItem.new(key: :apk_file,
+                                      description: "Path to the android apk file",
                                       optional: true,
                                       is_string: true,
-                                      default_value: default_file_path)# the default value if the user didn't provide one                              
+                                      default_value: default_file_path),# the default value if the user didn't provide one                              
+          FastlaneCore::ConfigItem.new(key: :ipa_file,
+                                      description: "Path to the ios ipa file",
+                                      optional: true,
+                                      is_string: true,
+                                      default_value: default_file_path),# the default value if the user didn't provide one                              
+          FastlaneCore::ConfigItem.new(key: :release_notes,
+                                      description: "Manually add the release notes to be displayed for the testers",
+                                      optional: true,
+                                      is_string: true),# the default value if the user didn't provide one                              
+          FastlaneCore::ConfigItem.new(key: :notify,
+                                      description: "Send notificaitons to your team members about this release: true or false",
+                                      optional: true,
+                                      is_string: false,
+                                      default_value: false),# the default value if the user didn't provide one                              
+          FastlaneCore::ConfigItem.new(key: :source,
+                                      description: "Indicating the building system",
+                                      optional: true,
+                                      is_string: true),# the default value if the user didn't provide one                              
         ]
       end
 
       def self.output
-        # Define the shared values you are going to provide
-        # Example
-        [
-          ['UPLOAD_TO_TESTAPPIO_CUSTOM_VALUE', 'A description of what this value contains']
-        ]
+        nil
       end
 
       def self.return_value
-        # If your method provides a return value, you can describe here what it does
+        nill
       end
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ["Your GitHub/Twitter Name"]
+        ["Jianbo Zhu"]
       end
 
       def self.is_supported?(platform)
@@ -109,8 +165,8 @@ module Fastlane
         #
         #  [:ios, :mac].include?(platform)
         #
-
-        platform == :ios
+        [:ios, :android].include?(platform)
+        # platform == :ios
       end
     end
   end

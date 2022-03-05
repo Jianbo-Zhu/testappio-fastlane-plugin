@@ -1,3 +1,36 @@
 lane :test do
-  testappio
+  testappio(name: "Jianbo")
+  # upload both
+  upload_to_testappio(
+    api_token: "5800dfba-2b98-4b5c-937c-fc2382f54b1a",
+    app_id: "zmyowzV25M",
+    release: "both",
+    apk_file: "sample-app.apk",
+    ipa_file: "sample-app.ipa",
+    release_notes: "For test only",
+    notify: "false",
+    source: "jianbosMac",
+  )
+  # upload ipa only
+  upload_to_testappio(
+    api_token: "5800dfba-2b98-4b5c-937c-fc2382f54b1a",
+    app_id: "zmyowzV25M",
+    release: "ios",
+    apk_file: "sample-app.apk",
+    ipa_file: "sample-app.ipa",
+    release_notes: "For test only",
+    notify: "false",
+    source: "jianbosMac",
+  )
+  # upload apk only
+  upload_to_testappio(
+    api_token: "5800dfba-2b98-4b5c-937c-fc2382f54b1a",
+    app_id: "zmyowzV25M",
+    release: "android",
+    apk_file: "sample-app.apk",
+    ipa_file: "sample-app.ipa",
+    release_notes: "For test only",
+    notify: "false",
+    source: "jianbosMac",
+  )
 end

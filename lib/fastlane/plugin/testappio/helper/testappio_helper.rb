@@ -14,6 +14,21 @@ module Fastlane
           UI.command(`curl -Ls https://github.com/Massad/cli/releases/latest/download/install | bash`)
         end
       end
+
+      def self.handle_error(errors)
+        fatal = false
+        for error in errors do
+          if error
+            if error =~ /error/
+              UI.error(error.to_s)
+              fatal = true
+            else
+              UI.verbose(error.to_s)
+            end
+          end
+        end
+        UI.user_error!('Error while calling ta-cli') if fatal
+      end
     end
   end
 end
