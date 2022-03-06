@@ -5,9 +5,7 @@ module Fastlane
 
   module Helper
     class TestappioHelper
-      # class methods that you define here become available in your action
-      # as `Helper::TestappioHelper.your_method`
-      #
+      # Check if `ta_cli` exists, install it if not
       def self.check_ta_cli
         unless `which ta-cli`.include?('ta-cli')
           UI.error("ta-cli not found, installing")
@@ -15,6 +13,8 @@ module Fastlane
         end
       end
 
+      # Handle errors from `ta_cli`, if contains 'Error', the process stops,
+      # otherwise, just print to user console
       def self.handle_error(errors)
         fatal = false
         for error in errors do
@@ -28,6 +28,34 @@ module Fastlane
           end
         end
         UI.user_error!('Error while calling ta-cli') if fatal
+      end
+
+      # Run the given command
+      def self.call_ta_cli(command)
+        UI.message "Starting ta-cli..."
+        require 'open3'
+        if FastlaneCore::Globals.verbose?
+          UI.verbose("ta-cli command:\n\n")
+          UI.command(command.to_s)
+          UI.verbose("\n\n")
+        end
+        final_command = command.map { |arg| Shellwords.escape(arg) }.join(" ")
+        out = []
+        error = []
+        Open3.popen3(final_command) do |stdin, stdout, stderr, wait_thr|
+          while (line = stdout.gets)
+            out << line
+            UI.message(line.strip!)
+          end
+          while (line = stderr.gets)
+            error << line.strip!
+          end
+          exit_status = wait_thr.value
+          unless exit_status.success? && error.empty?
+            handle_error(error)
+          end
+        end
+        out.join
       end
     end
   end
