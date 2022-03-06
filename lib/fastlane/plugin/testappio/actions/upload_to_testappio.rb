@@ -19,6 +19,8 @@ module Fastlane
         ipa_file = params[:ipa_file]
         release = params[:release]
         release_notes = params[:release_notes]
+        git_release_notes = params[:git_release_notes]
+        git_commit_id = params[:git_commit_id]
         notify = params[:notify]
 
         
@@ -33,6 +35,8 @@ module Fastlane
         command.push("--apk=#{apk_file}") unless release == "ios"
         command.push("--ipa=#{ipa_file}") unless release == "android"
         command.push("--release_notes=#{release_notes}")
+        command.push("--git_release_notes=#{git_release_notes}")
+        command.push("--git_commit_id=#{git_commit_id}")
         command.push("--notify=#{notify}")
         command.push("--source=Fastlane")
 
@@ -130,6 +134,16 @@ module Fastlane
                                       description: "Manually add the release notes to be displayed for the testers",
                                       optional: true,
                                       is_string: true),# the default value if the user didn't provide one                              
+          FastlaneCore::ConfigItem.new(key: :git_release_notes,
+                                      description: "Collect release notes from the latest git commit message to be displayed for the testers: true or false",
+                                      optional: true,
+                                      is_string: false,
+                                      default_value: true),# the default value if the user didn't provide one
+          FastlaneCore::ConfigItem.new(key: :git_commit_id,
+                                      description: "Include the last commit ID in the release notes (works with both release notes option): true or false",
+                                      optional: true,
+                                      is_string: false,
+                                      default_value: false),# the default value if the user didn't provide one
           FastlaneCore::ConfigItem.new(key: :notify,
                                       description: "Send notificaitons to your team members about this release: true or false",
                                       optional: true,
