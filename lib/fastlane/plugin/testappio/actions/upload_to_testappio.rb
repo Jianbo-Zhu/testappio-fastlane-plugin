@@ -20,7 +20,6 @@ module Fastlane
         release = params[:release]
         release_notes = params[:release_notes]
         notify = params[:notify]
-        source = params[:source]
 
         
         validate_file_path(apk_file)
@@ -35,7 +34,7 @@ module Fastlane
         command.push("--ipa=#{ipa_file}") unless release == "android"
         command.push("--release_notes=#{release_notes}")
         command.push("--notify=#{notify}")
-        command.push("--source=#{source}")
+        command.push("--source=Fastlane")
 
         UI.message "Uploading to testapp.io"
         require 'open3'
@@ -111,8 +110,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_id,
                                        env_name: "FL_UPLOAD_TO_TESTAPPIO_APP_ID",
                                        description: "You can get it from your app page in https://portal.testapp.io/apps",
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false), # the default value if the user didn't provide one
+                                       is_string: false), # true: verifies the input is a string, false: every kind of value
           FastlaneCore::ConfigItem.new(key: :release,
                                        env_name: "FL_UPLOAD_TO_TESTAPPIO_RELEASE",
                                        description: "It can be either both or android or ios",
@@ -136,12 +134,8 @@ module Fastlane
                                       description: "Send notificaitons to your team members about this release: true or false",
                                       optional: true,
                                       is_string: false,
-                                      default_value: false),# the default value if the user didn't provide one                              
-          FastlaneCore::ConfigItem.new(key: :source,
-                                      description: "Indicating the building system",
-                                      optional: true,
-                                      is_string: true),# the default value if the user didn't provide one                              
-        ]
+                                      default_value: false),# the default value if the user didn't provide one
+          ]
       end
 
       def self.output

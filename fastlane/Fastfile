@@ -8,8 +8,7 @@ lane :test do
     apk_file: "sample-app.apk",
     ipa_file: "sample-app.ipa",
     release_notes: "For test only",
-    notify: "false",
-    source: "jianbosMac",
+    notify: "false"
   )
   # upload ipa only
   upload_to_testappio(
@@ -19,8 +18,7 @@ lane :test do
     apk_file: "sample-app.apk",
     ipa_file: "sample-app.ipa",
     release_notes: "For test only",
-    notify: "false",
-    source: "jianbosMac",
+    notify: "false"
   )
   # upload apk only
   upload_to_testappio(
@@ -30,7 +28,6 @@ lane :test do
     apk_file: "sample-app.apk",
     ipa_file: "sample-app.ipa",
     release_notes: "For test only",
-    notify: "false",
-    source: "jianbosMac",
+    notify: "false"
   )
 end
