@@ -116,7 +116,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :release,
                                        env_name: "FL_UPLOAD_TO_TESTAPPIO_RELEASE",
                                        description: "It can be either both or android or ios",
-                                       is_string: true), # true: verifies the input is a string, false: every kind of value
+                                       is_string: true,
+                                      default_value: Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]), # true: verifies the input is a string, false: every kind of value
           FastlaneCore::ConfigItem.new(key: :apk_file,
                                       description: "Path to the android apk file",
                                       optional: true,
