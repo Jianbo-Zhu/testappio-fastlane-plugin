@@ -1,7 +1,7 @@
 require 'fastlane_core/ui/ui'
 
 module Fastlane
-  UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
+  UI = FastlaneCore::UI unless Fastlane.const_defined?(:UI)
 
   module Helper
     class TestappioHelper
@@ -17,7 +17,7 @@ module Fastlane
       # otherwise, just print to user console
       def self.handle_error(errors)
         fatal = false
-        for error in errors do
+        errors.each do |error|
           if error
             if error =~ /Error/
               UI.error(error.to_s)
@@ -32,7 +32,7 @@ module Fastlane
 
       # Run the given command
       def self.call_ta_cli(command)
-        UI.message "Starting ta-cli..."
+        UI.message("Starting ta-cli...")
         require 'open3'
         if FastlaneCore::Globals.verbose?
           UI.verbose("ta-cli command:\n\n")
