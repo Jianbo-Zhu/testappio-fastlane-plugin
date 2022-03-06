@@ -19,7 +19,7 @@ module Fastlane
         fatal = false
         for error in errors do
           if error
-            if error =~ /error/
+            if error =~ /Error/
               UI.error(error.to_s)
               fatal = true
             else
